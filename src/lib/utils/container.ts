@@ -1,35 +1,45 @@
-import { type PrismaClient } from "@prisma/client";
-import { type UserRepository, createUserRepository } from "~/repositories/user";
-import { type UserService, createUserService } from "~/services/user";
+import { PrismaClient } from "@prisma/client";
+import { type UserRepository, createUserRepository } from "~/lib/repositories/user";
+import { type UserService, createUserService } from "~/lib/services/user";
+import {ConfigurationService, createConfigurationService } from "../services/configuration";
+import { createEnvRepository } from "../repositories/env";
 
-export interface ServicesContainer {
-  userRepository: UserRepository;
+export interface ServicesContainer<T> {
   userService: UserService;
-  // Add other services and repositories
+  configService: ConfigurationService<T>;
 }
 
-let container: ServicesContainer | null = null;
+let container: Readonly<ServicesContainer<ReturnType<typeof createEnvRepository>>> | null = null;
 
-export const initializeContainer = (prisma: PrismaClient): ServicesContainer => {
+export const initServices = (): ServicesContainer<ReturnType<typeof createEnvRepository>> => {
   if (container) {
     return container;
   }
+
+  const configService = createConfigurationService();
+
+  const prisma = new PrismaClient({
+    log:
+      configService.getEnv("NODE_ENV") === "development" ? ["query", "error", "warn"] : ["error"],
+  });
+
+  prisma.$connect();
 
   const userRepository = createUserRepository(prisma);
   const userService = createUserService(userRepository);
 
   container = {
-    userRepository,
     userService,
-    // Initialize other services and repositories
+    configService,
   };
 
-  return container;
+  return Object.freeze(container);
 };
 
-export const getContainer = (): ServicesContainer => {
+export const getServicesContainer = <T = ReturnType<typeof createEnvRepository>>(): Readonly<ServicesContainer<T>> => {
   if (!container) {
     throw new Error("Container not initialized");
   }
-  return container;
+  
+  return container as Readonly<ServicesContainer<T>>;
 };

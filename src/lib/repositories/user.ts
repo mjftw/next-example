@@ -1,19 +1,18 @@
-import { type User } from "@prisma/client";
-import { type UserRepository } from "~/repositories/user";
+import { type PrismaClient, type User } from "@prisma/client";
 
-export interface UserService {
-  getUserById: (id: string) => Promise<User | null>;
-  createUser: (userData: Omit<User, "id">) => Promise<User>;
+export interface UserRepository {
+  findById: (id: string) => Promise<User | null>;
+  create: (user: Omit<User, "id">) => Promise<User>;
   // Add other methods as needed
 }
 
-export const createUserService = (userRepo: UserRepository): UserService => {
+export const createUserRepository = (prisma: PrismaClient): UserRepository => {
   return {
-    getUserById: async (id: string) => {
-      return userRepo.findById(id);
+    findById: async (id: string) => {
+      return prisma.user.findUnique({ where: { id } });
     },
-    createUser: async (userData: Omit<User, "id">) => {
-      return userRepo.create(userData);
+    create: async (user: Omit<User, "id">) => {
+      return prisma.user.create({ data: user });
     },
     // Implement other methods
   };
