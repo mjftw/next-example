@@ -75,7 +75,8 @@ graph TD
 ```
 
 ### Request Flow
-```sequenceDiagram
+```mermaid
+sequenceDiagram
     participant Client
     participant NextJS
     participant tRPC Router
