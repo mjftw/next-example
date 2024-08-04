@@ -12,8 +12,8 @@ export const createEnvRepository = () => {
           NODE_ENV: z
             .enum(["development", "test", "production"])
             .default("development"),
-            RABBITMQ_HOST: z.string().url(),
-            RABBITMQ_PORT: z.number().int().positive(),
+            RABBITMQ_HOST: z.string(),
+            RABBITMQ_PORT: z.coerce.number().int().positive(),
             RABBITMQ_USERNAME: z.string(),
             RABBITMQ_PASSWORD: z.string(),
         },
