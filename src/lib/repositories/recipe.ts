@@ -47,7 +47,9 @@ export const createRecipeRepository = (prisma: PrismaClient): RecipeRepository =
     addIngredient: async (recipeId, ingredientData) => {
       return prisma.recipeIngredient.create({
         data: {
-          recipeId,
+          recipe: {
+            connect: { id: recipeId }
+          },
           amount: ingredientData.amount,
           ingredient: {
             connectOrCreate: {
