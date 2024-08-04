@@ -12,6 +12,10 @@ export const createEnvRepository = () => {
           NODE_ENV: z
             .enum(["development", "test", "production"])
             .default("development"),
+            RABBITMQ_HOST: z.string().url(),
+            RABBITMQ_PORT: z.number().int().positive(),
+            RABBITMQ_USERNAME: z.string(),
+            RABBITMQ_PASSWORD: z.string(),
         },
       
         /**
@@ -21,6 +25,10 @@ export const createEnvRepository = () => {
         runtimeEnv: {
           DATABASE_URL: process.env.DATABASE_URL,
           NODE_ENV: process.env.NODE_ENV,
+          RABBITMQ_HOST: process.env.RABBITMQ_HOST,
+          RABBITMQ_PORT: process.env.RABBITMQ_PORT,
+          RABBITMQ_USERNAME: process.env.RABBITMQ_USERNAME,
+          RABBITMQ_PASSWORD: process.env.RABBITMQ_PASSWORD,
           // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
         },
         /**

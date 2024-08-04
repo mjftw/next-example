@@ -2,9 +2,9 @@ import { type PrismaClient, type Recipe, type Ingredient, type RecipeIngredient 
 
 export interface RecipeRepository {
   findById: (id: string) => Promise<Recipe | null>;
-  create: (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt"> & { ingredients: Array<Omit<RecipeIngredient, "id" | "recipeId">> }) => Promise<Recipe>;
+  create: (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt"> & { ingredients: Array<Omit<RecipeIngredient, "id" | "recipeId" | "ingredientId"> & { ingredient: { name: string } }> }) => Promise<Recipe>;
   update: (id: string, data: Partial<Omit<Recipe, "id" | "authorId">>) => Promise<Recipe>;
-  addIngredient: (recipeId: string, ingredientData: Omit<RecipeIngredient, "id" | "recipeId">) => Promise<RecipeIngredient>;
+  addIngredient: (recipeId: string, ingredientData: Omit<RecipeIngredient, "id" | "recipeId" | "ingredientId"> & { ingredient: { name: string } }) => Promise<RecipeIngredient>;
   removeIngredient: (recipeId: string, ingredientId: string) => Promise<void>;
   findByUser: (userId: string) => Promise<Recipe[]>;
   findAll: () => Promise<Recipe[]>;
