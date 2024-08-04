@@ -1,11 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 import { type UserRepository, createUserRepository } from "~/lib/repositories/user";
 import { type UserService, createUserService } from "~/lib/services/user";
-import {ConfigurationService, createConfigurationService } from "../services/configuration";
+import { type RecipeRepository, createRecipeRepository } from "~/lib/repositories/recipe";
+import { type RecipeService, createRecipeService } from "~/lib/services/recipe";
+import { ConfigurationService, createConfigurationService } from "../services/configuration";
 import { createEnvRepository } from "../repositories/env";
 
 export interface ServicesContainer<T> {
   userService: UserService;
+  recipeService: RecipeService;
   configService: ConfigurationService<T>;
 }
 
@@ -28,8 +31,12 @@ export const initServices = (): ServicesContainer<ReturnType<typeof createEnvRep
   const userRepository = createUserRepository(prisma);
   const userService = createUserService(userRepository);
 
+  const recipeRepository = createRecipeRepository(prisma);
+  const recipeService = createRecipeService(recipeRepository);
+
   container = {
     userService,
+    recipeService,
     configService,
   };
 

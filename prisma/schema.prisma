@@ -10,19 +10,43 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+model Recipe {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+  ingredients RecipeIngredient[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-    @@index([name])
+  @@index([authorId])
+}
+
+model Ingredient {
+  id       String @id @default(cuid())
+  name     String @unique
+  recipes  RecipeIngredient[]
+}
+
+model RecipeIngredient {
+  id           String @id @default(cuid())
+  recipeId     String
+  ingredientId String
+  amount       String
+  recipe       Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, ingredientId])
+  @@index([recipeId])
+  @@index([ingredientId])
 }
 
 model User {
   id        String   @id @default(cuid())
   name      String
   email     String   @unique
+  recipes   Recipe[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
