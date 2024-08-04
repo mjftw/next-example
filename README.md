@@ -1,29 +1,124 @@
-# Create T3 App
+# Next.js Example Application
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This project is an example application showcasing some good practices and architectural design principles for a Next.js application. It demonstrates how to structure a scalable, maintainable, and testable codebase using modern development techniques.
 
-## What's next? How do I make an app with this?
+## Architectural Principles
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+### 1. Functional Programming Style
+We prioritize functional programming principles throughout the codebase:
+- Use of closures over classes
+- Ensuring immutability by default
+- Favoring pure functions where possible
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+### 2. Dependency Injection and Inversion of Control
+- All external dependencies (database, APIs, environment variables) are accessed through interfaces
+- This allows for easy replacement during testing and promotes loose coupling
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Drizzle](https://orm.drizzle.team)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+### 3. Repository Pattern
+- Database access is abstracted behind repository interfaces
+- Promotes separation of concerns and makes it easier to switch data sources if needed
 
-## Learn More
+### 4. Service Pattern
+- Business logic is encapsulated in service layers
+- Services use repositories and other dependencies injected via factories
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+### 5. Factory Pattern
+- Repositories and services are constructed using factory functions
+- These factories take dependencies and return objects with methods that use these dependencies via closures
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+### 6. Connection Management
+- Long-running connections (e.g., database, message broker) are set up before the application runs
+- These connections are passed to the repositories and services that require them
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+### 7. Services Container
+- A singleton services container is created at the start of the application
+- It holds all instantiated services and repositories
+- Created in the NextJS instrumentation hook to ensure it's available before the router
 
-## How do I deploy this?
+### 8. tRPC Integration
+- tRPC routers use the services container for dependency injection
+- This allows for easy mocking in tests without relying on module mocking
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+### 9. Testing Strategy
+- Tests use mock/stub implementations of repository and service interfaces
+- This allows for isolated testing of each layer without complex setup
+
+## Architecture Diagrams
+
+### Application Structure
+```mermaid
+graph TD
+    A[Next.js App] --> B[tRPC API Layer]
+    B --> C[Services Container]
+    C --> D[User Service]
+    C --> E[Recipe Service]
+    C --> F[Configuration Service]
+    C --> G[Logger Service]
+    D --> H[User Repository]
+    E --> I[Recipe Repository]
+    E --> J[Recipe Event Publisher]
+    H --> K[Database Connection]
+    I --> K
+    J --> L[AMQP Connection]
+```
+
+### Dependency Injection Flow
+```mermaid
+graph TD
+    A[Factory Functions] --> B[Services Container]
+    B --> C[tRPC Routers]
+    B --> D[API Routes]
+    E[Configuration Service] --> A
+    F[Logger Service] --> A
+    G[Database Connection] --> A
+    H[AMQP Connection] --> A
+```
+
+### Request Flow
+```sequenceDiagram
+    participant Client
+    participant NextJS
+    participant tRPC Router
+    participant Service
+    participant Repository
+    participant Database
+
+    Client->>NextJS: HTTP Request
+    NextJS->>tRPC Router: Route Request
+    tRPC Router->>Service: Call Service Method
+    Service->>Repository: Data Operation
+    Repository->>Database: Query
+    Database-->>Repository: Result
+    Repository-->>Service: Data
+    Service-->>tRPC Router: Processed Result
+    tRPC Router-->>NextJS: Response
+    NextJS-->>Client: HTTP Response
+```
+
+## Project Structure
+
+- `src/lib/repositories`: Contains repository interfaces and implementations
+- `src/lib/services`: Houses service interfaces and implementations
+- `src/lib/connections`: Manages database and message broker connections
+- `src/lib/init`: Handles initialization of the services container
+- `src/server/api/routers`: Contains tRPC router definitions
+- `src/app`: Next.js app router structure
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies: `npm install` or `yarn install`
+3. Set up your environment variables (copy `.env.example` to `.env` and fill in the values)
+4. Start the development server: `npm run dev` or `yarn dev`
+
+## Testing
+
+Run the test suite with: `npm test` or `yarn test`
+
+## Contributing
+
+Contributions are welcome! Please read our contributing guidelines for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
