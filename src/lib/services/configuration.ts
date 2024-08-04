@@ -1,11 +1,10 @@
-import { createEnvRepository } from "../repositories/env";
+import { createEnvRepository, EnvRepository } from "../repositories/env";
 
-export interface ConfigurationService<T> {
+export interface ConfigurationService<T = EnvRepository> {
   getEnv: <K extends keyof T>(key: K) => T[K];
 }
 
-export const createConfigurationService = (): ConfigurationService<typeof envRepository> => {
-  const envRepository = createEnvRepository();
+export const createConfigurationService = (envRepository: EnvRepository): ConfigurationService<typeof envRepository> => {
 
   return {
     getEnv: <K extends keyof typeof envRepository>(key: K): (typeof envRepository)[K] => {

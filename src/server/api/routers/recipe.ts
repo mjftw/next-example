@@ -25,10 +25,11 @@ export const recipeRouter = createTRPCRouter({
       authorId: z.string(),
       ingredients: z.array(ingredientSchema),
     }))
-    .mutation(async ({ ctx, input }) => {
-      const { ingredients, ...recipeData } = input;
-      return ctx.services.recipeService.createRecipe({
+    .mutation(async ({ ctx: {services: {recipeService}}, input }) => {
+      const { ingredients, description,...recipeData } = input;
+      return recipeService.createRecipe({
         ...recipeData,
+        description: description ?? null,
         ingredients: ingredients.map(ing => ({
           amount: ing.amount,
           ingredient: { name: ing.name }
