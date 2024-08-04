@@ -9,7 +9,7 @@
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { getServicesContainer } from "~/lib/utils/container";
+import { getServicesContainer } from "~/lib/init/container";
 
 
 /**

@@ -1,7 +1,7 @@
 
 export async function register() {
   if (isServer()) {
-    const { initServices } = await import("./lib/utils/container");
+    const { initServices } = await import("./lib/init/container");
     // Initialize the services container before any other code runs
     initServices();
   }
