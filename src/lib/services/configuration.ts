@@ -8,7 +8,11 @@ export const createConfigurationService = (envRepository: EnvRepository): Config
 
   return {
     getEnv: <K extends keyof typeof envRepository>(key: K): (typeof envRepository)[K] => {
-      return envRepository[key];
+      const value = envRepository[key];
+      if (!value) {
+        throw new Error(`Environment variable ${key} not found`);
+      }
+      return value;
     },
   };
 };

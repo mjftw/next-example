@@ -16,6 +16,7 @@ export const createEnvRepository = () => {
             RABBITMQ_PORT: z.coerce.number().int().positive(),
             RABBITMQ_USERNAME: z.string(),
             RABBITMQ_PASSWORD: z.string(),
+            LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
         },
       
         /**
@@ -29,6 +30,7 @@ export const createEnvRepository = () => {
           RABBITMQ_PORT: process.env.RABBITMQ_PORT,
           RABBITMQ_USERNAME: process.env.RABBITMQ_USERNAME,
           RABBITMQ_PASSWORD: process.env.RABBITMQ_PASSWORD,
+          LOG_LEVEL: process.env.LOG_LEVEL,
           // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
         },
         /**

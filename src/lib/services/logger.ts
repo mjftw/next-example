@@ -14,8 +14,8 @@ export interface LoggerService {
 }
 
 export const createLoggerService = (configService: ConfigurationService): LoggerService => {
-  const logLevel: LogLevel = configService.getEnv("NODE_ENV") === "development" ? "debug" : "info";
-
+ const logLevel: LogLevel = configService.getEnv("LOG_LEVEL");
+ 
   const shouldLog = (level: LogLevel): boolean => {
     const levels: LogLevel[] = ["debug", "info", "warn", "error"];
     return levels.indexOf(level) >= levels.indexOf(logLevel);
