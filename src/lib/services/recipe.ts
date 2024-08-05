@@ -4,6 +4,7 @@ import { type RecipeEventPublisher } from "~/lib/events/recipeEventPublisher";
 
 export interface RecipeService {
   getRecipeById: (id: string) => Promise<Recipe | null>;
+  getLatestRecipe: () => Promise<Recipe | null>;
   createRecipe: (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt"> & { ingredients: Array<Omit<RecipeIngredient, "id" | "recipeId" | "ingredientId"> & { ingredient: { name: string } }> }) => Promise<Recipe>;
   updateRecipe: (id: string, data: Partial<Omit<Recipe, "id" | "authorId">>) => Promise<Recipe>;
   addIngredientToRecipe: (recipeId: string, ingredientData: Omit<RecipeIngredient, "id" | "recipeId" | "ingredientId"> & { ingredient: { name: string } }) => Promise<RecipeIngredient>;
@@ -16,6 +17,9 @@ export const createRecipeService = (recipeRepo: RecipeRepository, eventPublisher
   return {
     getRecipeById: async (id: string) => {
       return recipeRepo.findById(id);
+    },
+    getLatestRecipe: async () => {
+      return recipeRepo.findLatest();
     },
     createRecipe: async (recipe) => {
       const createdRecipe = await recipeRepo.create(recipe);

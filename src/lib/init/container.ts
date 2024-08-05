@@ -21,14 +21,19 @@ export interface ConnectionsContainer {
   amqpConnection: AMQPConnection;
 }
 
-let servicesContainer: Readonly<ServicesContainer> | null = null;
-let connectionsContainer: Readonly<ConnectionsContainer> | null = null;
+const putGlobal = <T>(key: string, value: T): void => {
+  (globalThis as unknown as Record<string, T>)[key] = value;
+};
+
+const getGlobal = <T>(key: string): T | null => {
+  return (globalThis as unknown as Record<string, T>)[key] || null;
+};
 
 export const initConnections = async (configService: ConfigurationService, logger: LoggerService): Promise<ConnectionsContainer> => {
+  let connectionsContainer = getGlobal<ConnectionsContainer>('connectionsContainer');
   if (connectionsContainer) {
     return connectionsContainer;
   }
-
 
   const databaseConnection = createDatabaseConnection(configService, logger);
   const amqpConnection = createAMQPConnection(configService, logger);
@@ -41,10 +46,13 @@ export const initConnections = async (configService: ConfigurationService, logge
     amqpConnection,
   });
 
+  putGlobal('connectionsContainer', connectionsContainer);
+
   return connectionsContainer;
 };
 
 export const initServices = async (): Promise<ServicesContainer> => {
+  let servicesContainer = getGlobal<ServicesContainer>('servicesContainer');
   if (servicesContainer) {
     return servicesContainer;
   }
@@ -65,7 +73,6 @@ export const initServices = async (): Promise<ServicesContainer> => {
   const recipeEventPublisher = createRecipeEventPublisher(amqpClient);
   const recipeService = createRecipeService(recipeRepository, recipeEventPublisher);
 
-
   servicesContainer = Object.freeze({
     userService,
     recipeService,
@@ -73,10 +80,13 @@ export const initServices = async (): Promise<ServicesContainer> => {
     logger,
   });
 
+  putGlobal('servicesContainer', servicesContainer);
+
   return servicesContainer;
 };
 
 export const getServicesContainer = (): Readonly<ServicesContainer> => {
+  const servicesContainer = getGlobal<ServicesContainer>('servicesContainer');
   if (!servicesContainer) {
     throw new Error("Services container not initialized");
   }
@@ -85,6 +95,7 @@ export const getServicesContainer = (): Readonly<ServicesContainer> => {
 };
 
 export const getConnectionsContainer = (): Readonly<ConnectionsContainer> => {
+  const connectionsContainer = getGlobal<ConnectionsContainer>('connectionsContainer');
   if (!connectionsContainer) {
     throw new Error("Connections container not initialized");
   }

@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { type Recipe, type RecipeIngredient } from "@prisma/client";
 
 const ingredientSchema = z.object({
   name: z.string().min(1),
@@ -17,6 +16,10 @@ export const recipeRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return ctx.services.recipeService.getRecipeById(input.id);
     }),
+
+  getLatest: publicProcedure.query(async ({ ctx }) => {
+    return ctx.services.recipeService.getLatestRecipe();
+  }),
 
   create: publicProcedure
     .input(z.object({

@@ -2,6 +2,7 @@ import { type PrismaClient, type Recipe, type Ingredient, type RecipeIngredient 
 
 export interface RecipeRepository {
   findById: (id: string) => Promise<Recipe | null>;
+  findLatest: () => Promise<Recipe | null>;
   create: (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt"> & { ingredients: Array<Omit<RecipeIngredient, "id" | "recipeId" | "ingredientId"> & { ingredient: { name: string } }> }) => Promise<Recipe>;
   update: (id: string, data: Partial<Omit<Recipe, "id" | "authorId">>) => Promise<Recipe>;
   addIngredient: (recipeId: string, ingredientData: Omit<RecipeIngredient, "id" | "recipeId" | "ingredientId"> & { ingredient: { name: string } }) => Promise<RecipeIngredient>;
@@ -15,6 +16,12 @@ export const createRecipeRepository = (prisma: PrismaClient): RecipeRepository =
     findById: async (id: string) => {
       return prisma.recipe.findUnique({
         where: { id },
+        include: { ingredients: { include: { ingredient: true } }, author: true }
+      });
+    },
+    findLatest: async () => {
+      return prisma.recipe.findFirst({
+        orderBy: { createdAt: "desc" },
         include: { ingredients: { include: { ingredient: true } }, author: true }
       });
     },
