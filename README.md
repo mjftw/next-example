@@ -24,6 +24,8 @@ We prioritize functional programming principles throughout the codebase:
 ### 4. Service Pattern
 - Business logic is encapsulated in service layers
 - Services use repositories and other dependencies injected via factories
+- Services do not interact with the outside world directly, but contain logic for doing so.
+  - E.g. We might want to publish an event at the same time as writing a record to DB. The Service co-oridinates this, but doesn't know how the work gets done (abstracted behind Repository interfaces)
 
 ### 5. Factory Pattern
 - Repositories and services are constructed using factory functions
