@@ -2,6 +2,9 @@
 
 This project is an example application showcasing some good practices and architectural design principles for a Next.js application. It demonstrates how to structure a scalable, maintainable, and testable codebase using modern development techniques.
 
+It's still a WIP, but will eventually be an app where users can share cooking recipes.
+Really the subject matter isn't important, and food is more fun than yet another blog post example.
+
 ## Architectural Principles
 
 ### 1. Functional Programming Style
